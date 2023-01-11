@@ -1,0 +1,47 @@
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+using namespace std;
+
+vector<unordered_map<string, int>> calculate_subscriptions(double budget, vector<string> newspapers, unordered_map<string, vector<double>> prices) {
+    vector<unordered_map<string, int>> valid_subscriptions;
+    unordered_map<string, int> current_sub;
+    void dfs(int idx, double remaining_budget) {
+        if (idx == newspapers.size()) {
+            if (remaining_budget == 0) {
+                valid_subscriptions.push_back(current_sub);
+            }
+            return;
+        }
+
+        string newspaper = newspapers[idx];
+        double daily_price = prices[newspaper][idx];
+        for (int i = 0; i <= remaining_budget / daily_price; i++) {
+            current_sub[newspaper] = i;
+            dfs(idx + 1, remaining_budget - i * daily_price);
+            current_sub.erase(newspaper);
+        }
+    }
+    dfs(0, budget);
+    return valid_subscriptions;
+}
+
+int main() {
+    vector<string> newspapers = {"TOI", "Hindu", "ET", "BM", "HT"};
+    unordered_map<string, vector<double>> prices = {
+        {"TOI", {3,3,3,3,3,6,5}},
+        {"Hindu", {2.5,2.5,2.5,4,2.5,2.5,4}},
+        {"ET", {4,10,4,1.5,1.5,1.5,1.5}},
+        {"BM", {1.5,1.5,2,2,4,4}},
+        {"HT", {2,2,2,2,2,2,2}}
+    };
+    double budget = 100;
+    auto res = calculate_subscriptions(budget, newspapers, prices);
+    for (auto sub : res) {
+        for (auto item : sub) {
+            cout << item.first << ": " << item.second << endl;
+        }
+        cout << endl;
+    }
+    return 0;
+}
